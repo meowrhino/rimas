@@ -1,7 +1,7 @@
 # rimas
 
 Buscador de rimas en castellano, catalán, inglés, francés y japonés, sin servidor: todo pasa en el navegador.
-En https://rimas.meowrhino.studio (Cloudflare Workers, `npx wrangler deploy`).
+En https://rimas.meowrhino.studio: Cloudflare Workers Builds conectado al repo, cada push a `main` publica (a mano, `npx wrangler deploy`).
 
 - `js/lang/<idioma>.js`: lo que sabe cada idioma. Castellano y catalán analizan cualquier palabra por reglas
   (sílabas, tónica, claves consonante y asonante). Inglés y francés solo buscan en su lista (la pronunciación

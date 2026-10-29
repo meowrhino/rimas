@@ -1,5 +1,5 @@
 // rimas en Cloudflare Workers (solo estáticos), con el dominio rimas.meowrhino.studio.
-// Publicar: npx wrangler deploy
+// Publica Workers Builds en cada push a main; a mano, npx wrangler deploy
 {
   "name": "rimas",
   "compatibility_date": "2026-10-01",
