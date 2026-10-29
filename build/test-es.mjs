@@ -1,5 +1,5 @@
 // node build/test.mjs — comprueba el algoritmo con palabras conocidas.
-import { analizar } from '../js/rima.js';
+import { analizar } from '../js/lang/es.js';
 import assert from 'node:assert/strict';
 
 const casos = [
@@ -48,15 +48,43 @@ const casos = [
   ['leer', 2, 1, 'er', 'e'],
   ['hecho', 2, 2, 'eCo', 'eo'],
   ['echo', 2, 2, 'eCo', 'eo'],
+  ['rápidamente', 5, 2, 'ente', 'ee'],
+  ['solamente', 4, 2, 'ente', 'ee'],
+  ['gente', 2, 2, 'ente', 'ee'],
+  ['mente', 2, 2, 'ente', 'ee'],
+  ['búho', 2, 2, 'uo', 'uo'],
+  ['ahora', 3, 2, 'ora', 'oa'],
+  ['reír', 2, 1, 'ir', 'i'],
+  ['huir', 1, 1, 'ir', 'i'],
+  ['muy', 1, 1, 'i', 'i'],
+  ['cuídate', 3, 3, 'idate', 'ie'],
+  ['elle', 2, 2, 'eye', 'ee'],
+  ['éxito', 3, 3, 'eksito', 'eo'],
+  ['acción', 2, 1, 'on', 'o'],
+  ['pasión', 2, 1, 'on', 'o'],
+  ['abrazo', 3, 2, 'azo', 'ao'],
+  ['paso', 2, 2, 'aso', 'ao'],
+  ['lunes', 2, 2, 'unes', 'ue'],
+  ['virus', 2, 2, 'irus', 'io'],
+  ['guion', 1, 1, 'on', 'o'],
+  ['línea', 3, 3, 'inea', 'ia'],
+  ['héroe', 3, 3, 'eroe', 'ee'],
+  ['oír', 2, 1, 'ir', 'i'],
+  ['ruido', 2, 2, 'ido', 'io'],
+  ['agua', 2, 2, 'agua', 'aa'],
+  ['antigua', 3, 2, 'igua', 'ia'],
+  ['lengua', 2, 2, 'engua', 'ea'],
+  ['yo', 1, 1, 'o', 'o'],
+  ['y', 1, 1, 'i', 'i'],
 ];
 let mal = 0;
 for (const [p, s, t, c, a] of casos) {
   const r = analizar(p);
   try {
-    assert.deepEqual([r.silabas, r.tonica, r.consonante, r.asonante], [s, t, c, a]);
+    assert.deepEqual([r.sil, r.tonica, r.cons, r.ason], [s, t, c, a]);
   } catch {
     mal++;
-    console.log(`✗ ${p}: esperaba ${[s, t, c, a].join(' ')} y salió ${[r.silabas, r.tonica, r.consonante, r.asonante].join(' ')}`);
+    console.log(`✗ ${p}: esperaba ${[s, t, c, a].join(' ')} y salió ${[r.sil, r.tonica, r.cons, r.ason].join(' ')}`);
   }
 }
 console.log(mal ? `${mal} de ${casos.length} mal` : `✓ ${casos.length} palabras bien`);

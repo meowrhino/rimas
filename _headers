@@ -1,0 +1,11 @@
+# Los listados pesan y cambian poco: un día de caché. Lo demás se revalida siempre (ETag), para que un cambio se vea al momento.
+/js/palabras/*
+  Cache-Control: public, max-age=86400
+/js/lang/*
+  Cache-Control: no-cache
+/js/app.js
+  Cache-Control: no-cache
+/css/*
+  Cache-Control: no-cache
+/fonts/*
+  Cache-Control: public, max-age=31536000, immutable

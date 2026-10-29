@@ -1,0 +1,9 @@
+build/
+.claude/
+.git/
+README.md
+CLAUDE.md
+wrangler.jsonc
+.gitignore
+.assetsignore
+.wrangler/

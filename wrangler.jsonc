@@ -1,0 +1,8 @@
+// rimas en Cloudflare Workers (solo estáticos), con el dominio rimas.meowrhino.studio.
+// Publicar: npx wrangler deploy
+{
+  "name": "rimas",
+  "compatibility_date": "2026-10-01",
+  "assets": { "directory": "./" },
+  "routes": [{ "pattern": "rimas.meowrhino.studio", "custom_domain": true }]
+}

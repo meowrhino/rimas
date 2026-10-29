@@ -3,13 +3,16 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="robots" content="noindex">
+<link rel="canonical" href="https://rimas.meowrhino.studio/">
+<meta name="description" content="Buscador de rimas consonantes y asonantes en castellano, català, english, français y 日本語.">
 <title>rimas</title>
 <link rel="stylesheet" href="css/estilo.css">
+<script>try { const t = localStorage.getItem('tema'); if (t) document.documentElement.dataset.theme = t; } catch {}</script>
 </head>
 <body>
 <header>
-  <h1><a href="#">rimas</a></h1>
+  <h1><a href="#">rimas</a> <button id="tema" type="button" aria-label="claro u oscuro">◐</button></h1>
+  <nav id="idiomas" aria-label="idioma"></nav>
   <form id="buscar" autocomplete="off">
     <input id="palabra" type="search" placeholder="una palabra" autofocus spellcheck="false" aria-label="palabra">
   </form>
@@ -21,9 +24,8 @@
   <section id="asonantes"><h2>asonantes</h2><ul></ul></section>
 </main>
 <footer>
-  <p>Rima consonante: desde la vocal tónica coincide todo. Asonante: solo las vocales. Las palabras salen por orden de uso (<a href="https://github.com/hermitdave/FrequencyWords">OpenSubtitles</a>, cruzado con un diccionario). Se distingue s/z y b≠v no se distingue; ll = y.</p>
+  <p>Consonante: desde la vocal tónica coincide todo el sonido. Asonante: solo las vocales. En francés, desde la última vocal; en japonés, las dos últimas moras. Las palabras salen por orden de uso (<a href="https://github.com/hermitdave/FrequencyWords">OpenSubtitles</a>); la pronunciación del inglés es de <a href="https://github.com/cmusphinx/cmudict">CMUdict</a>, la del francés de <a href="http://www.lexique.org">Lexique 383</a> y la del japonés de <a href="https://github.com/scriptin/jmdict-simplified">JMdict</a>. Castellano y catalán, por reglas (FreeLing limpia sus listas): b = v, ll = y en castellano; s ≠ z.</p>
 </footer>
-<script src="js/palabras.js"></script>
 <script type="module" src="js/app.js"></script>
 </body>
 </html>

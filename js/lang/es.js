@@ -1,5 +1,6 @@
-// rima.js — de una palabra en castellano saca su sílaba tónica y sus claves de rima.
-// Sirve en el navegador y en node (build/test.mjs).
+// castellano: de una palabra saca su sílaba tónica y sus claves de rima.
+// Sirve en el navegador y en node (build/es.mjs, build/test-es.mjs).
+export const nombre = 'castellano';
 
 const VOCAL = 'aeiouáéíóúü';
 const FUERTE = 'aeoáéíóú';          // una débil con tilde (í, ú) rompe el diptongo: cuenta como fuerte
@@ -61,6 +62,7 @@ export function analizar(palabra) {
   const ns = nucleos(f);
   if (!ns.length) return null;
   let tonica = ns.findIndex(([a, b]) => /[áéíóú]/.test(f.slice(a, b)));
+  if (/.mente$/.test(p) && p.length > 6) tonica = ns.length - 2; // «rápidamente»: la voz va en «men», no en la tilde
   if (tonica < 0) {
     if (ns.length === 1) tonica = 0;
     else {
@@ -78,10 +80,18 @@ export function analizar(palabra) {
   if (vocales.length > 2) vocales = [vocales[0], vocales[vocales.length - 1]]; // esdrújulas: tónica y última
   if (vocales.length === 2) vocales[1] = { i: 'e', u: 'o' }[vocales[1]] || vocales[1];
   return {
-    palabra: p,
-    silabas: ns.length,
+    w: p,
+    sil: ns.length,
     tonica: ns.length - tonica,       // 1 = aguda, 2 = llana, 3 = esdrújula
-    consonante,
-    asonante: vocales.join(''),
+    cons: consonante,
+    ason: vocales.join(''),
   };
+}
+
+const mostrar = (clave) => clave.replace(/C/g, 'ch').replace(/R/g, 'rr');
+
+// La línea que sale debajo del buscador.
+export function describir(e) {
+  const tipo = e.tonica ? ', ' + (['aguda', 'llana', 'esdrújula'][e.tonica - 1] || 'sobresdrújula') : '';
+  return `${e.sil} ${e.sil === 1 ? 'sílaba' : 'sílabas'}${tipo} · consonante <b>-${mostrar(e.cons)}</b> · asonante <b>${[...e.ason].join('-')}</b>`;
 }
