@@ -117,11 +117,18 @@ function buscar() {
       imperfectas.sort((x, y) => notaI.get(y) - notaI.get(x));
     }
   }
+  // Los botones solo ofrecen lo que hay: la rima fija la tónica (todo lo que rima con «hola» es llano), así que un
+  // filtro sin resultados posibles no sale; y si un filtro guardado ya no tiene sentido, se quita.
+  const todas = [...homofonas, ...ricas, ...cons, ...multi, ...ason, ...imperfectas];
+  const silabasHay = new Set(todas.map((x) => Math.min(x.sil, 5)));
+  const tonicasHay = new Set(todas.map((x) => x.tonica).filter(Boolean));
+  if (filtro && !silabasHay.has(filtro)) filtro = 0;
+  if (filtroT && !tonicasHay.has(filtroT)) filtroT = 0;
   const conFiltro = (lista) => lista.filter((x) => (!filtro || (filtro === 5 ? x.sil >= 5 : x.sil === filtro)) && (!filtroT || x.tonica === filtroT));
-  $('#silabas').innerHTML = [0, 1, 2, 3, 4, 5].map((n) =>
-    `<button data-n="${n}" aria-pressed="${n === filtro}">${n === 0 ? '∗' : n === 5 ? '5+' : n}</button>`).join('')
-    + (mod.tonicas ? '<span class="sep"></span>' + mod.tonicas.map((t, i) =>
-      `<button data-t="${i + 1}" class="t${i + 1}" aria-pressed="${i + 1 === filtroT}">${t}</button>`).join('') : '');
+  $('#silabas').innerHTML = (silabasHay.size > 1 ? [0, ...[1, 2, 3, 4, 5].filter((n) => silabasHay.has(n))].map((n) =>
+    `<button data-n="${n}" aria-pressed="${n === filtro}">${n === 0 ? '∗' : n === 5 ? '5+' : n}</button>`).join('') : '')
+    + (mod.tonicas && tonicasHay.size > 1 ? '<span class="sep"></span>' + mod.tonicas.map((t, i) => (tonicasHay.has(i + 1)
+      ? `<button data-t="${i + 1}" class="t${i + 1}" aria-pressed="${i + 1 === filtroT}">${t}</button>` : '')).join('') : '');
   pintar($('#homofonas ul'), conFiltro(homofonas));
   pintar($('#ricas ul'), conFiltro(ricas));
   pintar($('#consonantes ul'), conFiltro(cons));
