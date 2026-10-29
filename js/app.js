@@ -79,10 +79,12 @@ function buscar() {
   const e = entrada(u);
   if (!e) { $('#analisis').textContent = { es: 'no conozco esa palabra', ca: 'no conec aquesta paraula', en: 'unknown word', fr: 'mot inconnu', ja: 'その言葉は知りません' }[idioma]; return; }
   $('#analisis').innerHTML = mod.describir(e);
+  // el aviso de rima fácil se añade más abajo, cuando se sabe cuántas consonantes hay
   const mismas = (x) => x.w === u || x.w === e.w || x.r === u;
   let cons = (porCons.get(e.cons) || []).filter((x) => !mismas(x));
   let ason = (porAson.get(e.ason) || []).filter((x) => !mismas(x) && x.cons !== e.cons);
-  let ricas = [], homofonas = [], imperfectas = [];
+  let ricas = [], homofonas = [], imperfectas = [], multi = [];
+  const facil = cons.length > 300 ? ` · <span class="aviso">${mod.etiquetas?.facil || 'rima fácil'}: ${cons.length}</span>` : '';
   // Donde el idioma da la pronunciación entera (todos menos los desconocidos): orden por parecido de sonidos hacia
   // atrás con toda la frase («quieres ir» suena más a «decir» que a «salir»); las homófonas suenan igual; las ricas
   // coinciden en más sonidos de los que pide la rima (la consonante de apoyo; en francés, 3 sonidos); las que no
@@ -102,8 +104,13 @@ function buscar() {
     const pobres = cons.filter((x) => !homofonas.includes(x) && !ricas.includes(x) && comun(fq, fon.get(x)) < minSuficiente);
     cons = cons.filter((x) => !homofonas.includes(x) && !ricas.includes(x) && !pobres.includes(x));
     ason = [...pobres, ...ason];
-    const notaV = new Map(ason.map((x) => [x, Math.round(parecido(vq, fon.get(x).map(mod.vocal).filter(Boolean), mod.sim))]));
+    const vocales = (x) => fon.get(x).map(mod.vocal).filter(Boolean);
+    const notaV = new Map(ason.map((x) => [x, Math.round(parecido(vq, vocales(x), mod.sim))]));
     ason.sort((x, y) => notaV.get(y) - notaV.get(x));
+    // multisilábicas: calcan las vocales de más sílabas de las que pide la asonancia («quieres ir» → «interferí», i-e-e-i)
+    const minMulti = tokens(e.ason).length + 1;
+    multi = ason.filter((x) => comun(vq, vocales(x)) >= minMulti);
+    ason = ason.filter((x) => !multi.includes(x));
     if (mod.imperfectas !== false) {
       imperfectas = (porEsqueleto.get(esqueleto(e.cons)) || []).filter((x) => x.cons !== e.cons && !mismas(x));
       const notaI = new Map(imperfectas.map((x) => [x, Math.round(parecido(fq, mod.sonidos(x) || [], mod.sim))]));
@@ -118,6 +125,8 @@ function buscar() {
   pintar($('#homofonas ul'), conFiltro(homofonas));
   pintar($('#ricas ul'), conFiltro(ricas));
   pintar($('#consonantes ul'), conFiltro(cons));
+  $('#analisis').insertAdjacentHTML('beforeend', facil);
+  pintar($('#multisilabicas ul'), conFiltro(multi));
   pintar($('#asonantes ul'), conFiltro(ason));
   pintar($('#imperfectas ul'), conFiltro(imperfectas));
 }

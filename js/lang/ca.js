@@ -3,7 +3,7 @@
 import { simEs } from './rasgos.js';
 export const nombre = 'català';
 export const tonicas = ['aguda', 'plana', 'esdrúixola']; // 1, 2, 3; sirve para colorear y filtrar por métrica
-export const etiquetas = { homofonas: 'homòfones', ricas: 'consonants riques', consonantes: 'consonants', asonantes: 'assonants', imperfectas: 'imperfectes' };
+export const etiquetas = { homofonas: 'homòfones', ricas: 'consonants riques', consonantes: 'consonants', asonantes: 'assonants', imperfectas: 'imperfectes', multisilabicas: 'assonants multisil·làbiques', facil: 'rima fàcil' };
 export const sim = simEs;
 export const sonidos = (e) => [...sinAccent(fonetica(e.w))];          // la pronunciación entera, un sonido por letra
 export const vocal = (s) => ('aeiou@'.includes(s) ? s : null);

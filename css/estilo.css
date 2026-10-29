@@ -35,6 +35,7 @@ h2 { font-size: .75rem; font-weight: 400; color: var(--suave); text-transform: u
 #palabra:focus { border-bottom-style: solid; border-color: var(--tinta); }
 #analisis { color: var(--suave); min-height: 1.7em; margin: .75rem 0; font-size: .9rem; }
 #analisis b { color: var(--tinta); font-weight: 400; }
+#analisis .aviso { color: var(--esdrujula); }
 #silabas, #idiomas { display: flex; gap: .4rem; flex-wrap: wrap; }
 #idiomas { margin-bottom: 1.5rem; }
 #silabas:empty { display: none; }

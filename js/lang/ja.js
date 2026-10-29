@@ -2,7 +2,7 @@
 // Sirve en el navegador y en node (build/ja.mjs, build/test-ja.mjs).
 export const nombre = '日本語';
 // Rima por moras, como en el rap: lo que cuenta es la vocal de cada mora (母音韻); las consonantes parecidas ayudan (Kawahara 2007).
-export const etiquetas = { homofonas: '同音 · homófonas', ricas: '3モーラ以上 · tres moras o más', consonantes: '2モーラ · dos moras', asonantes: '母音韻 · vocales', imperfectas: '' };
+export const etiquetas = { homofonas: '同音 · homófonas', ricas: '3モーラ以上 · tres moras o más', consonantes: '2モーラ · dos moras', asonantes: '母音韻 · vocales', imperfectas: '', multisilabicas: '3モーラ以上の母音韻 · tres moras o más de vocales', facil: '簡単な韻 · rima fácil' };
 export const imperfectas = false;
 export const umbrales = { rica: 3 };                      // tres moras iguales o más (la clave son dos)
 export const sonidos = (e) => (e.r ? moras(e.r) : null);

@@ -4,7 +4,7 @@ import { simRasgos } from './rasgos.js';
 export const nombre = 'english';
 export const sep = ' ';                                             // las claves llevan los fonemas separados: "AY M"
 export const tonicas = ['masculine', 'feminine', 'dactylic'];       // acento en la última, penúltima o antepenúltima sílaba
-export const etiquetas = { homofonas: 'homophones', ricas: 'identical rhymes (same onset · leave / believe)', consonantes: 'perfect rhymes', asonantes: 'assonance', imperfectas: 'slant rhymes (consonance · shape / keep)' };
+export const etiquetas = { homofonas: 'homophones', ricas: 'identical rhymes (same onset · leave / believe)', consonantes: 'perfect rhymes', asonantes: 'assonance', imperfectas: 'slant rhymes (consonance · shape / keep)', multisilabicas: 'multisyllabic assonance', facil: 'easy rhyme' };
 
 const VOCALES = ['AA', 'AE', 'AH', 'AO', 'AW', 'AY', 'EH', 'ER', 'EY', 'IH', 'IY', 'OW', 'OY', 'UH', 'UW'];
 export const sim = simRasgos({

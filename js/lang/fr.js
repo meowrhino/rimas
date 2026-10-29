@@ -4,7 +4,7 @@
 import { simRasgos } from './rasgos.js';
 export const nombre = 'français';
 export const tonicas = ['masculine', 'féminine'];                   // féminine: acaba en e muda (rivière / fière)
-export const etiquetas = { homofonas: 'homophones', ricas: 'rimes riches (3 sons ou plus)', consonantes: 'rimes suffisantes (2 sons)', asonantes: 'rimes pauvres · assonances', imperfectas: 'contre-assonances (mêmes consonnes, autre voyelle)' };
+export const etiquetas = { homofonas: 'homophones', ricas: 'rimes riches (3 sons ou plus)', consonantes: 'rimes suffisantes (2 sons)', asonantes: 'rimes pauvres · assonances', imperfectas: 'contre-assonances (mêmes consonnes, autre voyelle)', multisilabicas: 'assonances sur plusieurs syllabes', facil: 'rime facile' };
 export const umbrales = { rica: 3, suficiente: 2 };                 // en sonidos comunes desde el final
 
 const VOCALES = [...'aeEiouy2@51§'];
