@@ -9,7 +9,7 @@ const input = $('#palabra');
 let idioma = '';
 let mod;            // el módulo del idioma: analizar (opcional) y describir
 let entradas = [];  // [{ w, r, cons, ason, sil }] por orden de uso
-let porPalabra, porLlano, porCons, porAson;
+let porPalabra, porLlano, porCons, porAson, porEsqueleto; // esqueleto: la clave consonante sin su vocal tónica (pelo/palo)
 const llano = (s) => s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').normalize('NFC').replace(/œ/g, 'oe').replace(/æ/g, 'ae'); // sin acentos, para buscar «cancion» o «ete»
 let filtro = 0;     // sílabas; 0 = todas
 let filtroT = 0;    // tónica: 1 aguda, 2 llana, 3 esdrújula; 0 = todas
@@ -28,13 +28,14 @@ async function cargar(l) {
     const [w, r, cons, ason, sil, tonica] = linea.split('\t');
     return { w, r, cons, ason, sil: +sil, tonica: +tonica, pos };
   });
-  porPalabra = new Map(); porLlano = new Map(); porCons = new Map(); porAson = new Map();
+  porPalabra = new Map(); porLlano = new Map(); porCons = new Map(); porAson = new Map(); porEsqueleto = new Map();
   for (const e of entradas) {
     porPalabra.has(e.w) || porPalabra.set(e.w, e);
     if (e.r) porPalabra.has(e.r) || porPalabra.set(e.r, e);
     porLlano.has(llano(e.w)) || porLlano.set(llano(e.w), e);
     (porCons.get(e.cons) || porCons.set(e.cons, []).get(e.cons)).push(e);
     (porAson.get(e.ason) || porAson.set(e.ason, []).get(e.ason)).push(e);
+    if (mod.fonetica) { const k = e.cons.slice(1); (porEsqueleto.get(k) || porEsqueleto.set(k, []).get(k)).push(e); }
   }
 }
 
@@ -53,7 +54,7 @@ function pintar(ul, lista, desde = 0) {
 
 function buscar() {
   const q = input.value.trim().toLowerCase().normalize('NFC');
-  $('#ricas ul').innerHTML = $('#consonantes ul').innerHTML = $('#asonantes ul').innerHTML = '';
+  for (const ul of document.querySelectorAll('main ul')) ul.innerHTML = '';
   document.querySelectorAll('.mas').forEach((b) => b.remove());
   $('#silabas').innerHTML = '';
   if (!q) { $('#analisis').textContent = ''; return; }
@@ -65,7 +66,7 @@ function buscar() {
   const mismas = (x) => x.w === u || x.w === e.w || x.r === u;
   let cons = (porCons.get(e.cons) || []).filter((x) => !mismas(x));
   const ason = (porAson.get(e.ason) || []).filter((x) => !mismas(x) && x.cons !== e.cons);
-  let ricas = [];
+  let ricas = [], homofonas = [], imperfectas = [];
   // Donde hay fonética por reglas (es, ca): orden por parecido de sonidos hacia atrás con toda la frase
   // («quieres ir» suena más a «decir» que a «salir»), y aparte las ricas, que coinciden también en el
   // sonido anterior a la vocal tónica (la consonante de apoyo). Entre iguales, por uso.
@@ -77,8 +78,14 @@ function buscar() {
     // la nota se redondea: entre parecidos casi iguales, manda el uso
     const nota = new Map(cons.map((x) => [x, Math.round(parecido(fq, fon.get(x)))]));
     cons.sort((x, y) => nota.get(y) - nota.get(x));
-    ricas = cons.filter((x) => comun(fq, fon.get(x)) > e.cons.length);
-    cons = cons.filter((x) => !ricas.includes(x));
+    const fu = llano(mod.fonetica(u));
+    homofonas = cons.filter((x) => fon.get(x) === fu);                       // suenan igual: hecho / echo
+    ricas = cons.filter((x) => !homofonas.includes(x) && comun(fq, fon.get(x)) > e.cons.length);
+    cons = cons.filter((x) => !ricas.includes(x) && !homofonas.includes(x));
+    // imperfectas (pararrima): mismas consonantes desde la tónica, otra vocal tónica: pelo / palo
+    imperfectas = (porEsqueleto.get(e.cons.slice(1)) || []).filter((x) => x.cons !== e.cons && !mismas(x));
+    const notaI = new Map(imperfectas.map((x) => [x, Math.round(parecido(fq, llano(mod.fonetica(x.w))))]));
+    imperfectas.sort((x, y) => notaI.get(y) - notaI.get(x));
     const notaV = new Map(ason.map((x) => [x, Math.round(parecido(vq, llano(mod.fonetica(x.w)).replace(/[^aeiouEO@]/g, '')))]));
     ason.sort((x, y) => notaV.get(y) - notaV.get(x));
   }
@@ -87,9 +94,11 @@ function buscar() {
     `<button data-n="${n}" aria-pressed="${n === filtro}">${n === 0 ? '∗' : n === 5 ? '5+' : n}</button>`).join('')
     + (mod.tonicas ? '<span class="sep"></span>' + mod.tonicas.map((t, i) =>
       `<button data-t="${i + 1}" class="t${i + 1}" aria-pressed="${i + 1 === filtroT}">${t}</button>`).join('') : '');
+  pintar($('#homofonas ul'), conFiltro(homofonas));
   pintar($('#ricas ul'), conFiltro(ricas));
   pintar($('#consonantes ul'), conFiltro(cons));
   pintar($('#asonantes ul'), conFiltro(ason));
+  pintar($('#imperfectas ul'), conFiltro(imperfectas));
 }
 
 async function desdeHash() {
