@@ -1,0 +1,36 @@
+:root {
+  --fondo: #faf8f3; --tinta: #1a1a1a; --suave: #777; --linea: #ddd; --marca: #1f52d6;
+  color-scheme: light dark;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --fondo: #15151a; --tinta: #ececec; --suave: #999; --linea: #333; --marca: #7a9cff; }
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0; padding: 1rem 16px 4rem; background: var(--fondo); color: var(--tinta);
+  font: 17px/1.45 Georgia, 'Times New Roman', serif; max-width: 60rem; margin-inline: auto;
+}
+a { color: inherit; }
+h1 { font-size: 1.2rem; font-weight: normal; margin: 0 0 1rem; letter-spacing: .05em; }
+h1 a { text-decoration: none; }
+h2 { font-size: .85rem; font-weight: normal; color: var(--suave); text-transform: uppercase; letter-spacing: .1em; margin: 2rem 0 .5rem; }
+#palabra {
+  width: 100%; font: inherit; font-size: 2rem; padding: .3em 0; border: 0; border-bottom: 2px solid var(--tinta);
+  background: none; color: inherit; outline: none; border-radius: 0; -webkit-appearance: none;
+}
+#analisis { color: var(--suave); min-height: 1.5em; margin: .5rem 0; }
+#analisis b { color: var(--tinta); font-weight: normal; text-decoration: underline; }
+#silabas { display: flex; gap: .4rem; flex-wrap: wrap; }
+#silabas:empty { display: none; }
+#silabas button {
+  font: inherit; font-size: .85rem; padding: .1em .7em; border: 1px solid var(--linea); border-radius: 2em;
+  background: none; color: var(--suave); cursor: pointer;
+}
+#silabas button[aria-pressed="true"] { border-color: var(--tinta); color: var(--tinta); }
+ul { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: .25em 1em; }
+li { cursor: pointer; }
+li:hover { color: var(--marca); }
+li.raro { color: var(--suave); }
+section:not(:has(li)) { display: none; }
+button.mas { font: inherit; font-size: .85rem; margin-top: .75rem; background: none; border: 1px solid var(--linea); border-radius: 2em; padding: .2em .9em; color: var(--suave); cursor: pointer; }
+footer { margin-top: 4rem; color: var(--suave); font-size: .8rem; border-top: 1px solid var(--linea); padding-top: 1rem; }
