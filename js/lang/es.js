@@ -1,7 +1,12 @@
 // castellano: de una palabra saca su sílaba tónica y sus claves de rima.
 // Sirve en el navegador y en node (build/es.mjs, build/test-es.mjs).
-export const tonicas = ['aguda', 'llana', 'esdrújula']; // 1, 2, 3; sirve para colorear y filtrar por métrica
+import { simEs } from './rasgos.js';
 export const nombre = 'castellano';
+export const tonicas = ['aguda', 'llana', 'esdrújula']; // 1, 2, 3; sirve para colorear y filtrar por métrica
+export const etiquetas = { homofonas: 'homófonas', ricas: 'consonantes ricas', consonantes: 'consonantes', asonantes: 'asonantes', imperfectas: 'imperfectas' };
+export const sim = simEs;
+export const sonidos = (e) => [...quitarTildes(fonetica(e.w))];       // la pronunciación entera, un sonido por letra
+export const vocal = (s) => ('aeiou'.includes(s) ? s : null);
 
 const VOCAL = 'aeiouáéíóúü';
 const FUERTE = 'aeoáéíóú';          // una débil con tilde (í, ú) rompe el diptongo: cuenta como fuerte

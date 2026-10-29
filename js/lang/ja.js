@@ -1,6 +1,21 @@
 // japonés: romaji → hiragana, hiragana → moras en romaji, y las claves de rima por moras.
 // Sirve en el navegador y en node (build/ja.mjs, build/test-ja.mjs).
 export const nombre = '日本語';
+// Rima por moras, como en el rap: lo que cuenta es la vocal de cada mora (母音韻); las consonantes parecidas ayudan (Kawahara 2007).
+export const etiquetas = { homofonas: '同音 · homófonas', ricas: '3モーラ以上 · tres moras o más', consonantes: '2モーラ · dos moras', asonantes: '母音韻 · vocales', imperfectas: '' };
+export const imperfectas = false;
+export const umbrales = { rica: 3 };                      // tres moras iguales o más (la clave son dos)
+export const sonidos = (e) => (e.r ? moras(e.r) : null);
+// Parecido entre dos moras: iguales 3; misma vocal 2 (+0,5 si la consonante es de la misma familia); misma consonante 1.
+const FAMILIA = { k: 1, g: 1, s: 2, z: 2, sh: 2, j: 2, t: 3, d: 3, ch: 3, ts: 3, n: 4, m: 4, h: 5, b: 5, p: 5, f: 5, r: 6, y: 7, w: 7, '': 7 };
+export function sim(a, b) {
+  if (a === b) return 3;
+  const [ca, va] = [a.replace(/[aiueo]$/, ''), a.match(/[aiueo]$/)?.[0]];
+  const [cb, vb] = [b.replace(/[aiueo]$/, ''), b.match(/[aiueo]$/)?.[0]];
+  if (!va || !vb) return 0;                                  // ん y っ solo se parecen a sí mismos
+  if (va === vb) return 2 + (ca === cb || FAMILIA[ca] === FAMILIA[cb] ? 0.5 : 0);
+  return ca === cb ? 1 : 0;
+}
 
 // Hepburn → hiragana; con las variantes de teclado (si, ti, tu, hu, zi, sya, jya…) a la misma kana.
 const TABLA = {
@@ -58,7 +73,7 @@ export function moras(h) {
   }
   return ms;
 }
-const vocal = (m) => (/[aiueo]$/.test(m) ? m.slice(-1) : m); // N y Q no tienen vocal: valen como tales
+export const vocal = (m) => (/[aiueo]$/.test(m) ? m.slice(-1) : m); // N y Q no tienen vocal: valen como tales
 
 export function analizar(texto) {
   const h = kana(texto);

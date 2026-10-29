@@ -2,18 +2,12 @@
 // Cruza la lista de frecuencia (OpenSubtitles) con CMUdict (primera pronunciación) y escribe js/palabras/en.js.
 import { readFileSync } from 'node:fs';
 import { escribir } from './escribir.mjs';
+import { claves } from '../js/lang/en.js';
 
 const [frecuencia, cmudict] = process.argv.slice(2);
 const MAX = 100000;
 
-// "rhyme R AY1 M" → { cons: 'AYM', ason: 'AY', sil: 1 }: desde la última vocal tónica (1, si no 2, si no la última)
-export function claves(fonemas) {
-  const vocales = fonemas.map((f, i) => (/\d/.test(f) ? i : -1)).filter((i) => i >= 0);
-  if (!vocales.length) return null;
-  const tonica = [...vocales].reverse().find((i) => fonemas[i].endsWith('1')) ?? [...vocales].reverse().find((i) => fonemas[i].endsWith('2')) ?? vocales.at(-1);
-  const desde = fonemas.slice(tonica).map((f) => f.replace(/\d/, ''));
-  return { cons: desde.join(''), ason: desde.filter((f, i) => /\d/.test(fonemas[tonica + i])).join(''), sil: vocales.length };
-}
+export { claves };
 
 export const dic = new Map();
 for (const linea of readFileSync(cmudict, 'utf8').split('\n')) {

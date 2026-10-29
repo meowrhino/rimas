@@ -34,6 +34,8 @@ for (const [p, phon, cons, ason, sil] of casos) {
   try { assert.deepEqual([r.cons, r.ason, r.sil], [cons, ason, sil]); }
   catch { mal++; console.log(`✗ ${p}: esperaba ${[cons, ason, sil].join(' ')} y salió ${[r.cons, r.ason, r.sil].join(' ')}`); }
 }
+// masculine / féminine por la grafía
+assert.deepEqual([claves('tabl', 'table').tonica, claves('ete', 'été').tonica, claves('S@t', 'chantent', 'VER').tonica, claves('mom@', 'moment', 'NOM').tonica, claves('fij', 'filles').tonica], [2, 1, 2, 1, 2]);
 // oui y lui riman entre sí (i), pero no con fille (ij)
 assert.notEqual(claves('wi').cons, claves('fij').cons);
 console.log(mal ? `${mal} de ${casos.length} mal` : `✓ ${casos.length} palabras bien`);

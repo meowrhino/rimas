@@ -1,11 +1,18 @@
 // català (central): de una palabra saca su sílaba tónica y sus claves de rima.
 // Sirve en el navegador y en node (build/ca.mjs, build/test-ca.mjs).
-export const tonicas = ['aguda', 'plana', 'esdrúixola']; // 1, 2, 3; sirve para colorear y filtrar por métrica
+import { simEs } from './rasgos.js';
 export const nombre = 'català';
+export const tonicas = ['aguda', 'plana', 'esdrúixola']; // 1, 2, 3; sirve para colorear y filtrar por métrica
+export const etiquetas = { homofonas: 'homòfones', ricas: 'consonants riques', consonantes: 'consonants', asonantes: 'assonants', imperfectas: 'imperfectes' };
+export const sim = simEs;
+export const sonidos = (e) => [...sinAccent(fonetica(e.w))];          // la pronunciación entera, un sonido por letra
+export const vocal = (s) => ('aeiou@'.includes(s) ? s : null);
 
 const VOCAL = 'aeiouàèéíòóúïü';
 const DEBIL = 'iu';                 // ï y ü nunca forman diptongo
-const BASE = { à: 'a', è: 'E', é: 'e', í: 'i', ò: 'O', ó: 'o', ú: 'u', ï: 'i', ü: 'u' };
+// è/é i ò/ó sonen diferent, però sense diccionari de pronúncia no sabem el timbre de les e/o sense accent:
+// les claus no el distingeixen (cafè rima amb pedra), i el parecido tampoc.
+const BASE = { à: 'a', è: 'e', é: 'e', í: 'i', ò: 'o', ó: 'o', ú: 'u', ï: 'i', ü: 'u' };
 const sinAccent = (s) => s.replace(/[àèéíòóúïü]/g, (c) => BASE[c]);
 
 // Forma fonética aproximada: una letra por sonido (C = tx, J = tj, Z = j/g, S = x, L = ll, ñ = ny, @ = vocal neutra).
@@ -87,7 +94,7 @@ export function analizar(palabra) {
     tonica = ns.length === 1 ? 0 : llana ? ns.length - 2 : ns.length - 1;
   }
   const vt = vocalTonica(f, ns[tonica]);
-  // desde la tónica: a/e átonas → @ (neutra), o → u; la tónica se queda con su timbre (è = E, ò = O)
+  // desde la tónica: a/e átonas → @ (neutra), o → u
   const reducir = (c, i) => (i === 0 ? sinAccent(c) : { a: '@', e: '@', o: 'u' }[c] || sinAccent(c));
   const consonante = [...f.slice(vt)].map(reducir).join('');
   let vocales = ns.slice(tonica).map((n, i) => reducir(f[i === 0 ? vt : vocalTonica(f, n)], i));
@@ -95,7 +102,7 @@ export function analizar(palabra) {
   return { w: p, sil: ns.length, tonica: ns.length - tonica, cons: consonante, ason: vocales.join('') };
 }
 
-const BONITO = { '@': 'ə', E: 'è', O: 'ò', L: 'll', Z: 'j', S: 'x', C: 'tx', J: 'tj', ñ: 'ny' };
+const BONITO = { '@': 'ə', L: 'll', Z: 'j', S: 'x', C: 'tx', J: 'tj', ñ: 'ny' };
 const mostrar = (clave) => [...clave].map((c) => BONITO[c] || c).join('');
 
 export function describir(e) {

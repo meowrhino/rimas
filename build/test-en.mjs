@@ -5,7 +5,7 @@ process.argv[2] = '';
 const { claves, dic } = await import('./en.mjs');
 const { describir } = await import('../js/lang/en.js');
 
-const c = (w) => claves(dic.get(w));
+const c = (w) => { const r = claves(dic.get(w)); return { ...r, cons: r.cons.replace(/ /g, ''), ason: r.ason.replace(/ /g, '') }; };
 const casos = [
   // palabra, cons, ason, sil
   ['rhyme', 'AYM', 'AY', 1],
@@ -37,7 +37,8 @@ for (const [w, cons, ason, sil] of casos) {
     console.log(`✗ ${w}: esperaba ${[cons, ason, sil].join(' ')} y salió ${[r.cons, r.ason, r.sil].join(' ')}`);
   }
 }
-assert.equal(describir({ ...c('rhyme'), w: 'rhyme' }), '1 syllable · rhyme <b>-aim</b> · vowels <b>ai</b>');
+assert.equal(describir({ ...claves(dic.get('rhyme')), w: 'rhyme' }), '1 syllable, masculine · rhyme <b>-aim</b> · vowels <b>ai</b>');
+assert.deepEqual([c('little').tonica, c('rhyme').tonica, c('beautiful').tonica, claves(dic.get('believe')).f], [2, 1, 3, 'B IH L IY V']);
 assert.notEqual(c('orange').cons, c('door').cons);
 console.log(mal ? `${mal} de ${casos.length} mal` : `✓ ${casos.length} palabras bien`);
 process.exit(mal ? 1 : 0);

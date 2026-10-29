@@ -13,6 +13,21 @@ let porPalabra, porLlano, porCons, porAson, porEsqueleto; // esqueleto: la clave
 const llano = (s) => s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').normalize('NFC').replace(/œ/g, 'oe').replace(/æ/g, 'ae'); // sin acentos, para buscar «cancion» o «ete»
 let filtro = 0;     // sílabas; 0 = todas
 let filtroT = 0;    // tónica: 1 aguda, 2 llana, 3 esdrújula; 0 = todas
+// la clave consonante en sonidos (en los separa con espacio) y su esqueleto: sin la vocal tónica (pelo → ·lo)
+const tokens = (clave) => (mod.sep ? clave.split(mod.sep) : [...clave]);
+const esqueleto = (clave) => tokens(clave).slice(1).join(mod.sep || '');
+const entrada = (w) => porPalabra.get(w) || porLlano.get(llano(w)) || mod.analizar?.(w);
+// los sonidos de una frase: sus palabras desde el final, hasta la primera que no se conozca
+function sonidosFrase(q) {
+  const palabras = q.split(/\s+/);
+  let out = [];
+  for (let i = palabras.length - 1; i >= 0; i--) {
+    const s = mod.sonidos(entrada(palabras[i]) || {});
+    if (!s) break;
+    out = [...s, ...out];
+  }
+  return out;
+}
 
 async function cargar(l) {
   if (l === idioma) return;
@@ -24,9 +39,10 @@ async function cargar(l) {
     const s = Object.assign(document.createElement('script'), { src: `js/palabras/${l}.js`, onload: ok, onerror: mal });
     document.head.append(s);
   })]);
+  for (const [k, v] of Object.entries(mod.etiquetas || {})) { const h = $(`#${k} h2`); if (h) h.textContent = v; }
   entradas = window.PALABRAS.split('\n').map((linea, pos) => {
-    const [w, r, cons, ason, sil, tonica] = linea.split('\t');
-    return { w, r, cons, ason, sil: +sil, tonica: +tonica, pos };
+    const [w, r, cons, ason, sil, tonica, f] = linea.split('\t');
+    return { w, r, cons, ason, sil: +sil, tonica: +tonica, f, pos };
   });
   porPalabra = new Map(); porLlano = new Map(); porCons = new Map(); porAson = new Map(); porEsqueleto = new Map();
   for (const e of entradas) {
@@ -35,7 +51,7 @@ async function cargar(l) {
     porLlano.has(llano(e.w)) || porLlano.set(llano(e.w), e);
     (porCons.get(e.cons) || porCons.set(e.cons, []).get(e.cons)).push(e);
     (porAson.get(e.ason) || porAson.set(e.ason, []).get(e.ason)).push(e);
-    if (mod.fonetica) { const k = e.cons.slice(1); (porEsqueleto.get(k) || porEsqueleto.set(k, []).get(k)).push(e); }
+    if (mod.sonidos && mod.imperfectas !== false) { const k = esqueleto(e.cons); (porEsqueleto.get(k) || porEsqueleto.set(k, []).get(k)).push(e); }
   }
 }
 
@@ -60,34 +76,39 @@ function buscar() {
   if (!q) { $('#analisis').textContent = ''; return; }
   history.replaceState(null, '', `#${idioma}:${q}`);
   const u = q.split(/\s+/).pop(); // «quieres ir» rima por su última palabra
-  const e = porPalabra.get(u) || porLlano.get(llano(u)) || mod.analizar?.(u);
+  const e = entrada(u);
   if (!e) { $('#analisis').textContent = { es: 'no conozco esa palabra', ca: 'no conec aquesta paraula', en: 'unknown word', fr: 'mot inconnu', ja: 'その言葉は知りません' }[idioma]; return; }
   $('#analisis').innerHTML = mod.describir(e);
   const mismas = (x) => x.w === u || x.w === e.w || x.r === u;
   let cons = (porCons.get(e.cons) || []).filter((x) => !mismas(x));
-  const ason = (porAson.get(e.ason) || []).filter((x) => !mismas(x) && x.cons !== e.cons);
+  let ason = (porAson.get(e.ason) || []).filter((x) => !mismas(x) && x.cons !== e.cons);
   let ricas = [], homofonas = [], imperfectas = [];
-  // Donde hay fonética por reglas (es, ca): orden por parecido de sonidos hacia atrás con toda la frase
-  // («quieres ir» suena más a «decir» que a «salir»), y aparte las ricas, que coinciden también en el
-  // sonido anterior a la vocal tónica (la consonante de apoyo). Entre iguales, por uso.
-  if (mod.fonetica) {
-    const fq = llano(mod.fonetica(q.replace(/\s+/g, '')));
-    const vq = fq.replace(/[^aeiouEO@]/g, '');
+  // Donde el idioma da la pronunciación entera (todos menos los desconocidos): orden por parecido de sonidos hacia
+  // atrás con toda la frase («quieres ir» suena más a «decir» que a «salir»); las homófonas suenan igual; las ricas
+  // coinciden en más sonidos de los que pide la rima (la consonante de apoyo; en francés, 3 sonidos); las que no
+  // llegan al mínimo (francés: rima pobre, solo la vocal) bajan con las asonantes. Entre iguales, por uso.
+  if (mod.sonidos) {
+    const fq = sonidosFrase(q);
+    const fe = mod.sonidos(e) || [];
+    const vq = fq.map(mod.vocal).filter(Boolean);
     const comun = (a, b) => { let n = 0; while (n < a.length && n < b.length && a.at(-1 - n) === b.at(-1 - n)) n++; return n; };
-    const fon = new Map(cons.map((x) => [x, llano(mod.fonetica(x.w))]));
-    // la nota se redondea: entre parecidos casi iguales, manda el uso
-    const nota = new Map(cons.map((x) => [x, Math.round(parecido(fq, fon.get(x)))]));
+    const fon = new Map([...cons, ...ason].map((x) => [x, mod.sonidos(x) || []]));
+    const nota = new Map(cons.map((x) => [x, Math.round(parecido(fq, fon.get(x), mod.sim))]));
     cons.sort((x, y) => nota.get(y) - nota.get(x));
-    const fu = llano(mod.fonetica(u));
-    homofonas = cons.filter((x) => fon.get(x) === fu);                       // suenan igual: hecho / echo
-    ricas = cons.filter((x) => !homofonas.includes(x) && comun(fq, fon.get(x)) > e.cons.length);
-    cons = cons.filter((x) => !ricas.includes(x) && !homofonas.includes(x));
-    // imperfectas (pararrima): mismas consonantes desde la tónica, otra vocal tónica: pelo / palo
-    imperfectas = (porEsqueleto.get(e.cons.slice(1)) || []).filter((x) => x.cons !== e.cons && !mismas(x));
-    const notaI = new Map(imperfectas.map((x) => [x, Math.round(parecido(fq, llano(mod.fonetica(x.w))))]));
-    imperfectas.sort((x, y) => notaI.get(y) - notaI.get(x));
-    const notaV = new Map(ason.map((x) => [x, Math.round(parecido(vq, llano(mod.fonetica(x.w)).replace(/[^aeiouEO@]/g, '')))]));
+    const minRica = mod.umbrales?.rica ?? tokens(e.cons).length + 1;
+    const minSuficiente = mod.umbrales?.suficiente ?? 0;
+    homofonas = cons.filter((x) => fon.get(x).join(' ') === fe.join(' '));
+    ricas = cons.filter((x) => !homofonas.includes(x) && comun(fq, fon.get(x)) >= minRica);
+    const pobres = cons.filter((x) => !homofonas.includes(x) && !ricas.includes(x) && comun(fq, fon.get(x)) < minSuficiente);
+    cons = cons.filter((x) => !homofonas.includes(x) && !ricas.includes(x) && !pobres.includes(x));
+    ason = [...pobres, ...ason];
+    const notaV = new Map(ason.map((x) => [x, Math.round(parecido(vq, fon.get(x).map(mod.vocal).filter(Boolean), mod.sim))]));
     ason.sort((x, y) => notaV.get(y) - notaV.get(x));
+    if (mod.imperfectas !== false) {
+      imperfectas = (porEsqueleto.get(esqueleto(e.cons)) || []).filter((x) => x.cons !== e.cons && !mismas(x));
+      const notaI = new Map(imperfectas.map((x) => [x, Math.round(parecido(fq, mod.sonidos(x) || [], mod.sim))]));
+      imperfectas.sort((x, y) => notaI.get(y) - notaI.get(x));
+    }
   }
   const conFiltro = (lista) => lista.filter((x) => (!filtro || (filtro === 5 ? x.sil >= 5 : x.sil === filtro)) && (!filtroT || x.tonica === filtroT));
   $('#silabas').innerHTML = [0, 1, 2, 3, 4, 5].map((n) =>
