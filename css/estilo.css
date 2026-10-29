@@ -19,9 +19,9 @@
   src: url("../fonts/inknut-600-latin-ext.woff2") format("woff2");
   unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
 }
-:root { --fondo: #fff; --tinta: #000; --suave: #999; --linea: rgba(0,0,0,.12); --linea2: rgba(0,0,0,.35); color-scheme: light dark; }
-@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --fondo: #121212; --tinta: #e0e0e0; --suave: #808080; --linea: rgba(255,255,255,.1); --linea2: rgba(255,255,255,.25); } }
-:root[data-theme="dark"] { --fondo: #121212; --tinta: #e0e0e0; --suave: #808080; --linea: rgba(255,255,255,.1); --linea2: rgba(255,255,255,.25); }
+:root { --fondo: #fff; --tinta: #000; --suave: #999; --linea: rgba(0,0,0,.12); --linea2: rgba(0,0,0,.35); --aguda: #1f52d6; --esdrujula: #c2410c; color-scheme: light dark; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --fondo: #121212; --tinta: #e0e0e0; --suave: #808080; --linea: rgba(255,255,255,.1); --linea2: rgba(255,255,255,.25); --aguda: #7a9cff; --esdrujula: #f59e6b; } }
+:root[data-theme="dark"] { --fondo: #121212; --tinta: #e0e0e0; --suave: #808080; --linea: rgba(255,255,255,.1); --linea2: rgba(255,255,255,.25); --aguda: #7a9cff; --esdrujula: #f59e6b; }
 * { box-sizing: border-box; }
 body { margin: 0 auto; padding: 30dvh 16px; min-height: 100dvh; display: flex; flex-direction: column; justify-content: center; max-width: 960px; background: var(--fondo); color: var(--tinta);
   font: 400 15px/1.7 'Inknut Antiqua', 'Hiragino Mincho ProN', 'Yu Mincho', 'Noto Serif JP', Georgia, serif; letter-spacing: .03em; }
@@ -45,7 +45,12 @@ ul { list-style: none; margin: 0; padding: 0; }
 li { display: inline; cursor: pointer; }
 li + li::before { content: '·'; color: var(--suave); margin: 0 .55em; }
 li:hover { text-decoration: underline; }
-li.raro { color: var(--suave); }
+li.raro { opacity: .5; }
+.t1 { color: var(--aguda); }
+.t3 { color: var(--esdrujula); }
+#silabas .sep { width: 1px; background: var(--linea); margin: 0 .3rem; }
+#silabas button.t1[aria-pressed="true"] { border-color: var(--aguda); }
+#silabas button.t3[aria-pressed="true"] { border-color: var(--esdrujula); }
 li small { color: var(--suave); font-size: .72em; margin-left: .3em; }
 section:not(:has(li)) { display: none; }
 button.mas { font: inherit; font-size: .8rem; margin-top: 1rem; display: block; background: none; border: 1px solid var(--linea); border-radius: 4px; padding: .2em .9em; color: var(--suave); cursor: pointer; }

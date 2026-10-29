@@ -1,5 +1,6 @@
 // node build/test.mjs — comprueba el algoritmo con palabras conocidas.
-import { analizar } from '../js/lang/es.js';
+import { analizar, fonetica } from '../js/lang/es.js';
+import { parecido } from '../js/lang/rasgos.js';
 import assert from 'node:assert/strict';
 
 const casos = [
@@ -86,6 +87,12 @@ for (const [p, s, t, c, a] of casos) {
     mal++;
     console.log(`✗ ${p}: esperaba ${[s, t, c, a].join(' ')} y salió ${[r.sil, r.tonica, r.cons, r.ason].join(' ')}`);
   }
+}
+// parecido fonético: «quieres ir» suena más a «decir» (es-ir ~ ez-ir) que a «salir»
+for (const [frase, mejor, peor] of [['quieres ir', 'decir', 'salir'], ['mi corazón', 'razón', 'canción'], ['cielo', 'hielo', 'pelo'], ['gato', 'pato', 'palo']]) {
+  const q = fonetica(frase.replace(/\s+/g, ''));
+  const [a, b] = [mejor, peor].map((w) => parecido(q, fonetica(w)));
+  if (!(a > b)) { mal++; console.log(`✗ parecido: con «${frase}», ${mejor} (${a.toFixed(2)}) tendría que ganar a ${peor} (${b.toFixed(2)})`); }
 }
 console.log(mal ? `${mal} de ${casos.length} mal` : `✓ ${casos.length} palabras bien`);
 process.exit(mal ? 1 : 0);

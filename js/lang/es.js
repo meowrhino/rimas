@@ -1,5 +1,6 @@
 // castellano: de una palabra saca su sílaba tónica y sus claves de rima.
 // Sirve en el navegador y en node (build/es.mjs, build/test-es.mjs).
+export const tonicas = ['aguda', 'llana', 'esdrújula']; // 1, 2, 3; sirve para colorear y filtrar por métrica
 export const nombre = 'castellano';
 
 const VOCAL = 'aeiouáéíóúü';

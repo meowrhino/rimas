@@ -1,5 +1,6 @@
 // català (central): de una palabra saca su sílaba tónica y sus claves de rima.
 // Sirve en el navegador y en node (build/ca.mjs, build/test-ca.mjs).
+export const tonicas = ['aguda', 'plana', 'esdrúixola']; // 1, 2, 3; sirve para colorear y filtrar por métrica
 export const nombre = 'català';
 
 const VOCAL = 'aeiouàèéíòóúïü';
