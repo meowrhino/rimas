@@ -3,6 +3,13 @@ import { parecido } from './lang/rasgos.js';
 const IDIOMAS = { es: 'castellano', ca: 'català', en: 'english', fr: 'français', ja: '日本語' };
 const TOPE = 400;   // palabras que se pintan de golpe; el resto, con «más»
 const RARO = 0.4;   // a partir de esta fracción de la lista (por uso), la palabra sale en gris
+const LEYENDA = {
+  es: { titulo: 'colores', raro: 'poco usada', facil: 'más de 300 consonantes' },
+  ca: { titulo: 'colors', raro: 'poc usada', facil: 'més de 300 consonants' },
+  en: { titulo: 'colours', raro: 'rare word', facil: 'over 300 perfect rhymes' },
+  fr: { titulo: 'couleurs', raro: 'mot rare', facil: 'plus de 300 rimes' },
+  ja: { titulo: '色 · colores', raro: 'あまり使わない · poco usada', facil: '300以上 · más de 300' },
+};
 
 const $ = (s) => document.querySelector(s);
 const input = $('#palabra');
@@ -40,6 +47,11 @@ async function cargar(l) {
     document.head.append(s);
   })]);
   for (const [k, v] of Object.entries(mod.etiquetas || {})) { const h = $(`#${k} h2`); if (h) h.textContent = v; }
+  // leyenda (abajo a la derecha): el color de cada acento, el gris de las poco usadas y qué es una rima fácil
+  const L = LEYENDA[l];
+  $('#leyenda summary').textContent = L.titulo;
+  $('#leyenda p').innerHTML = [...(mod.tonicas || []).map((t, i) => `<span class="t${i + 1}">${t}</span>`),
+    `<span class="raro">${L.raro}</span>`, `<span class="aviso">${mod.etiquetas?.facil || 'rima fácil'}</span>: ${L.facil}`].join('<br>');
   entradas = window.PALABRAS.split('\n').map((linea, pos) => {
     const [w, r, cons, ason, sil, tonica, f] = linea.split('\t');
     return { w, r, cons, ason, sil: +sil, tonica: +tonica, f, pos };
@@ -152,7 +164,7 @@ $('#silabas').onclick = (e) => {
   if (e.target.dataset.t) { filtroT = filtroT === +e.target.dataset.t ? 0 : +e.target.dataset.t; buscar(); }
 };
 $('#idiomas').onclick = async (e) => { if (e.target.dataset.l) { await cargar(e.target.dataset.l); buscar(); input.focus(); } };
-document.querySelector('main').onclick = (e) => { const li = e.target.closest('li'); if (li) { input.value = li.dataset.w; buscar(); scrollTo(0, 0); } };
+document.querySelector('main').onclick = (e) => { const li = e.target.closest('li'); if (li) { history.pushState(null, '', `#${idioma}:${li.dataset.w}`); input.value = li.dataset.w; buscar(); scrollTo(0, 0); } }; // pushState: «atrás» vuelve a la palabra anterior
 // claro/oscuro: el del sistema, salvo que se toque el interruptor (se guarda)
 $('#tema').onclick = () => {
   const oscuro = matchMedia('(prefers-color-scheme: dark)').matches;

@@ -35,7 +35,7 @@ h2 { font-size: .75rem; font-weight: 400; color: var(--suave); text-transform: u
 #palabra:focus { border-bottom-style: solid; border-color: var(--tinta); }
 #analisis { color: var(--suave); min-height: 1.7em; margin: .75rem 0; font-size: .9rem; }
 #analisis b { color: var(--tinta); font-weight: 400; }
-#analisis .aviso { color: var(--esdrujula); }
+.aviso { color: var(--tinta); text-decoration: underline wavy var(--suave); text-underline-offset: .25em; } /* ni azul ni naranja: no es un acento */
 #silabas, #idiomas { display: flex; gap: .4rem; flex-wrap: wrap; }
 #idiomas { margin-bottom: 1.5rem; }
 #silabas:empty { display: none; }
@@ -46,7 +46,13 @@ ul { list-style: none; margin: 0; padding: 0; }
 li { display: inline; cursor: pointer; }
 li + li::before { content: '·'; color: var(--suave); margin: 0 .55em; }
 li:hover { text-decoration: underline; }
-li.raro { opacity: .5; }
+li.raro, #leyenda .raro { opacity: .5; }
+#leyenda { position: fixed; right: 16px; bottom: 16px; font-size: .75rem; background: var(--fondo); border: 1px solid var(--linea); border-radius: 4px; padding: .2em .8em; }
+#leyenda summary { color: var(--suave); cursor: pointer; text-align: right; list-style: none; }
+#leyenda summary::-webkit-details-marker { display: none; }
+#leyenda summary::after { content: ' ▴'; }
+#leyenda[open] summary::after { content: ' ▾'; }
+#leyenda p { margin: .4rem 0 .2rem; line-height: 1.9; }
 .t1 { color: var(--aguda); }
 .t3 { color: var(--esdrujula); }
 #silabas .sep { width: 1px; background: var(--linea); margin: 0 .3rem; }
