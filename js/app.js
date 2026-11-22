@@ -70,13 +70,13 @@ async function cargar(l) {
 function pintar(ul, lista, desde = 0) {
   ul.insertAdjacentHTML('beforeend', lista.slice(desde, desde + TOPE).map((e) =>
     `<li class="${e.pos > entradas.length * RARO ? 'raro' : ''} ${e.tonica ? 't' + e.tonica : ''}" data-w="${e.w}" data-s="${e.sil}" style="--u:${(Math.log10(e.pos + 1) / Math.log10(entradas.length)).toFixed(2)}">${mod.etiqueta ? mod.etiqueta(e) : e.w}</li>`).join(' '));
-  ul.parentElement.querySelector('.mas')?.remove();
+  if (ul.nextElementSibling?.classList.contains('mas')) ul.nextElementSibling.remove();
   if (lista.length > desde + TOPE) {
     const b = document.createElement('button');
     b.className = 'mas';
     b.textContent = `+${lista.length - desde - TOPE}`;
     b.onclick = () => pintar(ul, lista, desde + TOPE);
-    ul.parentElement.append(b);
+    ul.after(b);
   }
 }
 
@@ -96,6 +96,7 @@ function buscar() {
   let cons = (porCons.get(e.cons) || []).filter((x) => !mismas(x));
   let ason = (porAson.get(e.ason) || []).filter((x) => !mismas(x) && x.cons !== e.cons);
   let ricas = [], homofonas = [], imperfectas = [], multi = [];
+  let ricasOtra = [], consOtra = []; // agudas: las que no comparten la vocal de antes de la tónica
   const facil = cons.length > 300 ? ` · <span class="aviso">${mod.etiquetas?.facil || 'rima fácil'}: ${cons.length}</span>` : '';
   // Donde el idioma da la pronunciación entera (todos menos los desconocidos): orden por parecido de sonidos hacia
   // atrás con toda la frase («quieres ir» suena más a «decir» que a «salir»); las homófonas suenan igual; las ricas
@@ -119,6 +120,12 @@ function buscar() {
     const vocales = (x) => fon.get(x).map(mod.vocal).filter(Boolean);
     const notaV = new Map(ason.map((x) => [x, Math.round(parecido(vq, vocales(x), mod.sim))]));
     ason.sort((x, y) => notaV.get(y) - notaV.get(x));
+    // agudas: la rima es solo una vocal y lo que la sigue, y el oído se agarra también a la vocal de antes
+    // (fatal suena más a natal que a digital): ricas y consonantes, partidas; primero las que la comparten
+    const pre = (v) => (e.tonica === 1 ? v.at(-2) : undefined);
+    const partir = (lista) => (pre(vq) ? [lista.filter((x) => pre(vocales(x)) === pre(vq)), lista.filter((x) => pre(vocales(x)) !== pre(vq))] : [lista, []]);
+    [ricas, ricasOtra] = partir(ricas);
+    [cons, consOtra] = partir(cons);
     // multisilábicas: calcan las vocales de más sílabas de las que pide la asonancia («quieres ir» → «interferí», i-e-e-i)
     const minMulti = tokens(e.ason).length + 1;
     multi = ason.filter((x) => comun(vq, vocales(x)) >= minMulti);
@@ -131,7 +138,7 @@ function buscar() {
   }
   // Los botones solo ofrecen lo que hay: la rima fija la tónica (todo lo que rima con «hola» es llano), así que un
   // filtro sin resultados posibles no sale; y si un filtro guardado ya no tiene sentido, se quita.
-  const todas = [...homofonas, ...ricas, ...cons, ...multi, ...ason, ...imperfectas];
+  const todas = [...homofonas, ...ricas, ...ricasOtra, ...cons, ...consOtra, ...multi, ...ason, ...imperfectas];
   const silabasHay = new Set(todas.map((x) => Math.min(x.sil, 5)));
   const tonicasHay = new Set(todas.map((x) => x.tonica).filter(Boolean));
   if (filtro && !silabasHay.has(filtro)) filtro = 0;
@@ -143,7 +150,9 @@ function buscar() {
       ? `<button data-t="${i + 1}" class="t${i + 1}" aria-pressed="${i + 1 === filtroT}">${t}</button>` : '')).join('') : '');
   pintar($('#homofonas ul'), conFiltro(homofonas));
   pintar($('#ricas ul'), conFiltro(ricas));
+  pintar($('#ricas .otra'), conFiltro(ricasOtra));
   pintar($('#consonantes ul'), conFiltro(cons));
+  pintar($('#consonantes .otra'), conFiltro(consOtra));
   $('#analisis').insertAdjacentHTML('beforeend', facil);
   pintar($('#multisilabicas ul'), conFiltro(multi));
   pintar($('#asonantes ul'), conFiltro(ason));

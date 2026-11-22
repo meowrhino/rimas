@@ -60,5 +60,7 @@ li.raro, #leyenda .raro { opacity: .5; }
 #silabas button.t3[aria-pressed="true"] { border-color: var(--esdrujula); }
 li small { color: var(--suave); font-size: .72em; margin-left: .3em; }
 section:not(:has(li)) { display: none; }
+.otra:not(:has(li)) { display: none; }
+.otra { margin-top: .75rem; padding-top: .75rem; border-top: 1px dashed var(--linea); }
 button.mas { font: inherit; font-size: .8rem; margin-top: 1rem; display: block; background: none; border: 1px solid var(--linea); border-radius: 4px; padding: .2em .9em; color: var(--suave); cursor: pointer; }
 footer { margin-top: 3rem; color: var(--suave); font-size: .75rem; border-top: 1px solid var(--linea); padding-top: 1rem; }
