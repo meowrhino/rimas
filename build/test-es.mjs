@@ -94,5 +94,12 @@ for (const [frase, mejor, peor] of [['quieres ir', 'decir', 'salir'], ['mi coraz
   const [a, b] = [mejor, peor].map((w) => parecido(q, fonetica(w)));
   if (!(a > b)) { mal++; console.log(`✗ parecido: con «${frase}», ${mejor} (${a.toFixed(2)}) tendría que ganar a ${peor} (${b.toFixed(2)})`); }
 }
+// tipos de palabra, de FreeLing, en la lista (build/es.mjs)
+globalThis.window = {};
+await import('../js/palabras/es.js');
+const tipos = new Map(window.PALABRAS.split('\n').map((l) => [l.split('\t')[0], l.split('\t')[7]]));
+for (const [w, t] of [['yo', 'o'], ['canto', 'nv'], ['cantó', 'v'], ['bonito', 'na'], ['ayer', 'nr'], ['dominó', 'nv']]) {
+  if (tipos.get(w) !== t) { mal++; console.log(`✗ tipo: ${w} tendría que ser ${t} y es ${tipos.get(w)}`); }
+}
 console.log(mal ? `${mal} de ${casos.length} mal` : `✓ ${casos.length} palabras bien`);
 process.exit(mal ? 1 : 0);

@@ -4,6 +4,7 @@ import { simEs } from './rasgos.js';
 export const nombre = 'castellano';
 export const tonicas = ['aguda', 'llana', 'esdrújula']; // 1, 2, 3; sirve para colorear y filtrar por métrica
 export const etiquetas = { homofonas: 'homófonas', ricas: 'consonantes ricas', consonantes: 'consonantes', asonantes: 'asonantes', imperfectas: 'imperfectas', multisilabicas: 'asonantes multisilábicas', facil: 'rima fácil' };
+export const tipos = { n: 'sustantivo', a: 'adjetivo', v: 'verbo', r: 'adverbio', o: 'otras' }; // de FreeLing, en la lista; filtran los resultados
 export const sim = simEs;
 export const sonidos = (e) => [...quitarTildes(fonetica(e.w))];       // la pronunciación entera, un sonido por letra
 export const vocal = (s) => ('aeiou'.includes(s) ? s : null);

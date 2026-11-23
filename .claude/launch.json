@@ -1,6 +1,6 @@
 {
   "version": "0.0.1",
   "configurations": [
-    { "name": "rimas", "runtimeExecutable": "python3", "runtimeArgs": ["-m", "http.server", "8765"], "port": 8765 }
+    { "name": "rimas", "runtimeExecutable": "npx", "runtimeArgs": ["-y", "http-server@14.1.1", "/Users/meowrhino/Documents/GitHub/rimas", "-p", "8765", "-c-1"], "port": 8765 }
   ]
 }

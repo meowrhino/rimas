@@ -20,6 +20,7 @@ let porPalabra, porLlano, porCons, porAson, porEsqueleto; // esqueleto: la clave
 const llano = (s) => s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').normalize('NFC').replace(/œ/g, 'oe').replace(/æ/g, 'ae'); // sin acentos, para buscar «cancion» o «ete»
 let filtro = 0;     // sílabas; 0 = todas
 let filtroT = 0;    // tónica: 1 aguda, 2 llana, 3 esdrújula; 0 = todas
+let filtroP = '';   // tipo de palabra (mod.tipos: n sustantivo, v verbo…); '' = todas
 // la clave consonante en sonidos (en los separa con espacio) y su esqueleto: sin la vocal tónica (pelo → ·lo)
 const tokens = (clave) => (mod.sep ? clave.split(mod.sep) : [...clave]);
 const esqueleto = (clave) => tokens(clave).slice(1).join(mod.sep || '');
@@ -53,8 +54,8 @@ async function cargar(l) {
   $('#leyenda p').innerHTML = [...(mod.tonicas || []).map((t, i) => `<span class="t${i + 1}">${t}</span>`),
     `<span class="raro">${L.raro}</span>`, `<span class="aviso">${mod.etiquetas?.facil || 'rima fácil'}</span>: ${L.facil}`].join('<br>');
   entradas = window.PALABRAS.split('\n').map((linea, pos) => {
-    const [w, r, cons, ason, sil, tonica, f] = linea.split('\t');
-    return { w, r, cons, ason, sil: +sil, tonica: +tonica, f, pos };
+    const [w, r, cons, ason, sil, tonica, f, tipos = ''] = linea.split('\t');
+    return { w, r, cons, ason, sil: +sil, tonica: +tonica, f, tipos, pos };
   });
   porPalabra = new Map(); porLlano = new Map(); porCons = new Map(); porAson = new Map(); porEsqueleto = new Map();
   for (const e of entradas) {
@@ -143,11 +144,15 @@ function buscar() {
   const tonicasHay = new Set(todas.map((x) => x.tonica).filter(Boolean));
   if (filtro && !silabasHay.has(filtro)) filtro = 0;
   if (filtroT && !tonicasHay.has(filtroT)) filtroT = 0;
-  const conFiltro = (lista) => lista.filter((x) => (!filtro || (filtro === 5 ? x.sil >= 5 : x.sil === filtro)) && (!filtroT || x.tonica === filtroT));
+  const tiposHay = new Set(todas.flatMap((x) => [...x.tipos]));
+  if (filtroP && !tiposHay.has(filtroP)) filtroP = '';
+  const conFiltro = (lista) => lista.filter((x) => (!filtro || (filtro === 5 ? x.sil >= 5 : x.sil === filtro)) && (!filtroT || x.tonica === filtroT) && (!filtroP || x.tipos.includes(filtroP)));
   $('#silabas').innerHTML = (silabasHay.size > 1 ? [0, ...[1, 2, 3, 4, 5].filter((n) => silabasHay.has(n))].map((n) =>
     `<button data-n="${n}" aria-pressed="${n === filtro}">${n === 0 ? '∗' : n === 5 ? '5+' : n}</button>`).join('') : '')
     + (mod.tonicas && tonicasHay.size > 1 ? '<span class="sep"></span>' + mod.tonicas.map((t, i) => (tonicasHay.has(i + 1)
-      ? `<button data-t="${i + 1}" class="t${i + 1}" aria-pressed="${i + 1 === filtroT}">${t}</button>` : '')).join('') : '');
+      ? `<button data-t="${i + 1}" class="t${i + 1}" aria-pressed="${i + 1 === filtroT}">${t}</button>` : '')).join('') : '')
+    + (mod.tipos && tiposHay.size > 1 ? '<span class="sep"></span>' + Object.entries(mod.tipos).map(([k, t]) => (tiposHay.has(k)
+      ? `<button data-p="${k}" aria-pressed="${k === filtroP}">${t}</button>` : '')).join('') : '');
   pintar($('#homofonas ul'), conFiltro(homofonas));
   pintar($('#ricas ul'), conFiltro(ricas));
   pintar($('#ricas .otra'), conFiltro(ricasOtra));
@@ -171,6 +176,7 @@ input.oninput = buscar;
 $('#silabas').onclick = (e) => {
   if (e.target.dataset.n) { filtro = +e.target.dataset.n; buscar(); }
   if (e.target.dataset.t) { filtroT = filtroT === +e.target.dataset.t ? 0 : +e.target.dataset.t; buscar(); }
+  if (e.target.dataset.p) { filtroP = filtroP === e.target.dataset.p ? '' : e.target.dataset.p; buscar(); }
 };
 $('#idiomas').onclick = async (e) => { if (e.target.dataset.l) { await cargar(e.target.dataset.l); buscar(); input.focus(); } };
 document.querySelector('main').onclick = (e) => { const li = e.target.closest('li'); if (li) { history.pushState(null, '', `#${idioma}:${li.dataset.w}`); input.value = li.dataset.w; buscar(); scrollTo(0, 0); } }; // pushState: «atrás» vuelve a la palabra anterior
