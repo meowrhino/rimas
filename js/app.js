@@ -1,6 +1,8 @@
 // app.js — carga el idioma, indexa su lista y pinta las rimas. Lo que sabe de cada idioma está en js/lang/<idioma>.js.
 import { parecido } from './lang/rasgos.js';
 const IDIOMAS = { es: 'castellano', ca: 'català', en: 'english', fr: 'français', ja: '日本語' };
+const SINONIMOS = 'https://palabras.meowrhino.studio/'; // la web hermana, de sinónimos: el enlace sigue a la palabra
+const CON_SINONIMOS = ['es', 'ca', 'en', 'fr'];
 const TOPE = 400;   // palabras que se pintan de golpe; el resto, con «más»
 const RARO = 0.4;   // a partir de esta fracción de la lista (por uso), la palabra sale en gris
 const LEYENDA = {
@@ -86,6 +88,8 @@ function buscar() {
   for (const ul of document.querySelectorAll('main ul')) ul.innerHTML = '';
   document.querySelectorAll('.mas').forEach((b) => b.remove());
   $('#silabas').innerHTML = '';
+  $('#hermana').hidden = !CON_SINONIMOS.includes(idioma);
+  $('#hermana').href = SINONIMOS + (q ? `#${idioma}:${encodeURIComponent(q.split(/\s+/).pop())}` : '');
   if (!q) { $('#analisis').textContent = ''; return; }
   history.replaceState(null, '', `#${idioma}:${q}`);
   const u = q.split(/\s+/).pop(); // «quieres ir» rima por su última palabra

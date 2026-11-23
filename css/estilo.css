@@ -28,7 +28,9 @@ body { margin: 0 auto; padding: 30dvh 16px; min-height: 100dvh; display: flex; f
 a { color: inherit; }
 h1 { font-size: 1rem; font-weight: 600; margin: 0 0 1.5rem; display: flex; justify-content: space-between; align-items: center; }
 #tema { font: inherit; font-size: 1.1rem; background: none; border: 0; color: var(--suave); cursor: pointer; padding: 0 .2em; }
-#tema:hover { color: var(--tinta); }
+#tema:hover, #hermana:hover { color: var(--tinta); }
+h1 span { display: flex; align-items: center; gap: .8rem; }
+#hermana { font-weight: 400; font-size: .85rem; color: var(--suave); text-decoration: none; }
 h1 a { text-decoration: none; }
 h2 { font-size: .75rem; font-weight: 400; color: var(--suave); text-transform: uppercase; letter-spacing: .15em; margin: 2.5rem 0 .75rem; padding-top: .75rem; border-top: 1px solid var(--linea); }
 #palabra { width: 100%; font: inherit; font-weight: 600; font-size: 2.2rem; line-height: 1.5; padding: .2em 0; border: 0; border-bottom: 1.5px dashed var(--linea2); background: none; color: inherit; outline: none; border-radius: 0; -webkit-appearance: none; }
